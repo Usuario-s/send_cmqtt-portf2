@@ -1,32 +1,19 @@
-```python
 import paho.mqtt.client as paho
 import time
 import streamlit as st
 import json
 import platform
 
-# ==================================================
-# CONFIGURACIÓN DE LA PÁGINA
-# ==================================================
-
 st.set_page_config(
-    page_title="SPACE CONTROL | MQTT",
+    page_title="SPACE CONTROL",
     page_icon="🚀",
     layout="wide"
 )
 
-# ==================================================
-# DISEÑO FUTURISTA
-# ==================================================
-
 st.markdown("""
 <style>
-
-/* FONDO GENERAL */
 .stApp {
-    background:
-        radial-gradient(ellipse at 50% 0%, #142d49 0%, transparent 55%),
-        linear-gradient(145deg, #050b14, #071321 55%, #02060c);
+    background: radial-gradient(ellipse at top, #142d49, #050b14 65%, #02060c);
     color: #e8fbff;
 }
 
@@ -41,22 +28,15 @@ st.markdown("""
 .block-container {
     max-width: 1100px;
     padding-top: 2rem;
-    padding-bottom: 3rem;
 }
 
-/* TEXTOS */
-h1, h2, h3, p, label {
-    color: #e8fbff !important;
-}
-
-/* CABECERA */
 .hero {
     text-align: center;
-    padding: 20px 0 30px 0;
+    padding: 25px 0 35px;
 }
 
 .hero-title {
-    font-size: clamp(30px, 5vw, 48px);
+    font-size: 44px;
     font-weight: 900;
     letter-spacing: 5px;
     color: #61f7ff;
@@ -64,26 +44,19 @@ h1, h2, h3, p, label {
 }
 
 .hero-subtitle {
-    margin-top: 12px;
     color: #7699b3;
     font-size: 11px;
     letter-spacing: 4px;
+    margin-top: 12px;
 }
 
-/* PANELES */
 .panel {
-    background: linear-gradient(
-        145deg,
-        rgba(17, 38, 59, 0.96),
-        rgba(5, 14, 26, 0.98)
-    );
-    border: 1px solid rgba(0, 230, 255, 0.30);
+    background: linear-gradient(145deg, #11263b, #050e1a);
+    border: 1px solid rgba(0, 230, 255, 0.35);
     border-radius: 15px;
     padding: 24px;
-    margin: 10px 0 20px 0;
-    box-shadow:
-        0 0 25px rgba(0, 225, 255, 0.06),
-        inset 0 0 20px rgba(0, 225, 255, 0.025);
+    margin: 10px 0 20px;
+    box-shadow: 0 0 25px rgba(0, 225, 255, 0.06);
 }
 
 .panel-heading {
@@ -98,10 +71,8 @@ h1, h2, h3, p, label {
     color: #7899af;
     font-size: 11px;
     letter-spacing: 1.5px;
-    line-height: 1.8;
 }
 
-/* BOTONES */
 .stButton > button {
     width: 100%;
     min-height: 52px;
@@ -112,59 +83,35 @@ h1, h2, h3, p, label {
     font-weight: 800;
     letter-spacing: 2px;
     transition: all 0.2s ease;
-    box-shadow: 0 0 10px rgba(0, 225, 255, 0.06);
 }
 
 .stButton > button:hover {
-    color: #ffffff;
-    border-color: #ffffff;
-    background: linear-gradient(135deg, #07516b, #12374f);
-    box-shadow: 0 0 22px rgba(0, 225, 255, 0.25);
+    color: white;
+    border-color: white;
+    background: #07516b;
+    box-shadow: 0 0 22px rgba(0, 225, 255, 0.3);
     transform: translateY(-2px);
-}
-
-.stButton > button:active {
-    transform: scale(0.98);
-}
-
-/* SLIDER */
-.stSlider {
-    padding-top: 15px;
-    padding-bottom: 10px;
-}
-
-.stSlider [data-baseweb="slider"] > div {
-    cursor: pointer;
 }
 
 .stSlider [role="slider"] {
     background: #62f7ff !important;
-    border: 3px solid #ffffff !important;
+    border: 3px solid white !important;
     width: 23px !important;
     height: 23px !important;
-    box-shadow:
-        0 0 8px #00eaff,
-        0 0 20px #00eaff !important;
+    box-shadow: 0 0 8px #00eaff, 0 0 20px #00eaff !important;
 }
 
 .stSlider [data-testid="stSliderTrackFill"] {
     background: linear-gradient(90deg, #087cbd, #00f5ff) !important;
 }
 
-/* ESCALA DEL SLIDER */
-.stSlider [data-testid="stTickBar"] {
-    background: transparent;
-}
-
-/* INDICADOR DE POTENCIA */
 .power-card {
     background: linear-gradient(135deg, #0b2033, #06101c);
-    border: 1px solid rgba(0, 230, 255, 0.38);
+    border: 1px solid rgba(0, 230, 255, 0.4);
     border-radius: 12px;
     padding: 25px 20px;
     text-align: center;
-    margin: 12px 0 20px 0;
-    box-shadow: inset 0 0 25px rgba(0, 230, 255, 0.025);
+    margin: 12px 0 20px;
 }
 
 .power-label {
@@ -174,10 +121,10 @@ h1, h2, h3, p, label {
 }
 
 .power-number {
-    font-size: clamp(45px, 7vw, 68px);
+    font-size: 60px;
     font-weight: 900;
     color: #61f7ff;
-    text-shadow: 0 0 20px rgba(0, 225, 255, 0.55);
+    text-shadow: 0 0 20px rgba(0, 225, 255, 0.6);
     margin: 12px 0;
 }
 
@@ -196,7 +143,6 @@ h1, h2, h3, p, label {
 
 .power-fill {
     height: 100%;
-    border-radius: 20px;
     background: linear-gradient(90deg, #087cbd, #00f5ff);
     box-shadow: 0 0 14px #00eaff;
 }
@@ -208,7 +154,6 @@ h1, h2, h3, p, label {
     letter-spacing: 2px;
 }
 
-/* INFORMACIÓN TÉCNICA */
 .tech-box {
     border: 1px solid rgba(0, 230, 255, 0.18);
     background: rgba(4, 14, 25, 0.7);
@@ -219,25 +164,17 @@ h1, h2, h3, p, label {
     line-height: 2;
 }
 
-/* PIE */
 .footer-tech {
     text-align: center;
     font-size: 10px;
     color: #4e7288;
     letter-spacing: 3px;
-    padding: 25px 0 5px 0;
-}
-
-hr {
-    border-color: rgba(0, 230, 255, 0.18);
+    padding: 25px 0;
 }
 
 @media (max-width: 600px) {
     .hero-title {
-        letter-spacing: 2px;
-    }
-
-    .hero-subtitle {
+        font-size: 30px;
         letter-spacing: 2px;
     }
 
@@ -245,47 +182,37 @@ hr {
         padding: 17px;
     }
 }
-
 </style>
 """, unsafe_allow_html=True)
 
-# ==================================================
-# VARIABLES ORIGINALES
-# ==================================================
 
+# VARIABLES
 values = 0.0
 act1 = "OFF"
+message_received = ""
 
-# ==================================================
-# FUNCIONES MQTT ORIGINALES
-# ==================================================
 
+# FUNCIONES MQTT
 def on_publish(client, userdata, result):
-    print("el dato ha sido publicado \n")
-    pass
+    print("El dato ha sido publicado\n")
 
 
 def on_message(client, userdata, message):
     global message_received
     time.sleep(2)
-    message_received = str(message.payload.decode("utf-8"))
-    st.write(message_received)
+    message_received = message.payload.decode("utf-8")
+    print(message_received)
 
 
-# ==================================================
-# BROKER ORIGINAL
-# ==================================================
-
+# BROKER
 broker = "157.230.214.127"
 port = 1883
 
 client1 = paho.Client("secundeta")
 client1.on_message = on_message
 
-# ==================================================
-# CABECERA
-# ==================================================
 
+# CABECERA
 st.markdown("""
 <div class="hero">
     <div class="hero-title">🚀 SPACE CONTROL</div>
@@ -295,10 +222,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ==================================================
-# INFORMACIÓN DEL SISTEMA
-# ==================================================
 
+# INFORMACIÓN
 st.markdown("""
 <div class="panel">
     <div class="panel-heading">▰ SYSTEM INFORMATION</div>
@@ -308,19 +233,17 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-info1, info2 = st.columns(2)
+col_info1, col_info2 = st.columns(2)
 
-with info1:
+with col_info1:
     st.markdown("""
     <div class="tech-box">
-        <b style="color:#61f7ff">PYTHON VERSION</b><br>
+        <b style="color:#61f7ff">PYTHON VERSION</b>
+    </div>
     """, unsafe_allow_html=True)
+    st.write(platform.python_version())
 
-    st.write("Versión de Python:", platform.python_version())
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-with info2:
+with col_info2:
     st.markdown(f"""
     <div class="tech-box">
         <b style="color:#61f7ff">MQTT BROKER</b><br>
@@ -330,10 +253,8 @@ with info2:
     </div>
     """, unsafe_allow_html=True)
 
-# ==================================================
-# CONTROL DEL ACTUADOR
-# ==================================================
 
+# CONTROL ON / OFF
 st.markdown("""
 <div class="panel">
     <div class="panel-heading">▰ MAIN ENGINE CONTROL</div>
@@ -346,39 +267,43 @@ st.markdown("""
 col1, col2 = st.columns(2)
 
 with col1:
-    if st.button("▲  ACTIVATE ENGINE — ON", key="btn_on"):
+    if st.button("▲ ACTIVATE ENGINE — ON", key="btn_on"):
         act1 = "ON"
-
         client1 = paho.Client("secundeta")
         client1.on_publish = on_publish
-        client1.connect(broker, port)
 
-        message = json.dumps({"Act1": act1})
-        ret = client1.publish("cm1", message)
-
-        st.success("Comando ON enviado.")
-
-        client1.disconnect()
+        try:
+            client1.connect(broker, port, 60)
+            message = json.dumps({"Act1": act1})
+            result = client1.publish("cm1", message)
+            result.wait_for_publish(timeout=3)
+            st.success("Comando ON enviado.")
+        except Exception as e:
+            st.error(f"Error MQTT: {e}")
+        finally:
+            if client1.is_connected():
+                client1.disconnect()
 
 with col2:
-    if st.button("▼  SHUT DOWN — OFF", key="btn_off"):
+    if st.button("▼ SHUT DOWN — OFF", key="btn_off"):
         act1 = "OFF"
-
         client1 = paho.Client("secundeta")
         client1.on_publish = on_publish
-        client1.connect(broker, port)
 
-        message = json.dumps({"Act1": act1})
-        ret = client1.publish("cm1", message)
+        try:
+            client1.connect(broker, port, 60)
+            message = json.dumps({"Act1": act1})
+            result = client1.publish("cm1", message)
+            result.wait_for_publish(timeout=3)
+            st.success("Comando OFF enviado.")
+        except Exception as e:
+            st.error(f"Error MQTT: {e}")
+        finally:
+            if client1.is_connected():
+                client1.disconnect()
 
-        st.success("Comando OFF enviado.")
 
-        client1.disconnect()
-
-# ==================================================
-# CONTROL ANALÓGICO / ACELERADOR DE LA NAVE
-# ==================================================
-
+# CONTROL ANALÓGICO
 st.markdown("""
 <div class="panel">
     <div class="panel-heading">▰ THRUST CONTROL SYSTEM</div>
@@ -398,7 +323,6 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Slider original: rango 0.0 a 100.0
 values = st.slider(
     "🚀 Selecciona la potencia de la nave",
     min_value=0.0,
@@ -408,52 +332,46 @@ values = st.slider(
     key="thrust_slider"
 )
 
-# Indicador dinámico de potencia
 st.markdown(f"""
 <div class="power-card">
     <div class="power-label">CURRENT ENGINE THRUST</div>
-
-    <div class="power-number">
-        {values:.1f}<span>%</span>
-    </div>
-
+    <div class="power-number">{values:.1f}<span>%</span></div>
     <div class="power-track">
         <div class="power-fill" style="width:{values}%;"></div>
     </div>
-
     <div class="power-caption">
         ENGINE OUTPUT // {values:.1f}% // THROTTLE CONTROL
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Valor original
 st.write("Values:", values)
 
-# Envío del valor analógico original
-if st.button("🚀  TRANSMIT ANALOG POWER", key="btn_analog"):
 
+# ENVIAR VALOR ANALÓGICO
+if st.button("🚀 TRANSMIT ANALOG POWER", key="btn_analog"):
     client1 = paho.Client("secundeta")
     client1.on_publish = on_publish
-    client1.connect(broker, port)
 
-    message = json.dumps({"Analog": float(values)})
-    ret = client1.publish("cm2", message)
+    try:
+        client1.connect(broker, port, 60)
+        message = json.dumps({"Analog": float(values)})
+        result = client1.publish("cm2", message)
+        result.wait_for_publish(timeout=3)
+        st.success(f"Potencia enviada: {values:.1f}%")
+    except Exception as e:
+        st.error(f"Error MQTT: {e}")
+    finally:
+        if client1.is_connected():
+            client1.disconnect()
 
-    st.success(f"Potencia enviada: {values:.1f}%")
 
-    client1.disconnect()
-
-# ==================================================
 # PIE DE PÁGINA
-# ==================================================
-
 st.markdown("""
 <div class="footer-tech">
     SPACE CONTROL SYSTEM // MQTT TRANSMISSION INTERFACE
 </div>
 """, unsafe_allow_html=True)
-```
 
 
 
